@@ -7,10 +7,15 @@ using UnityEngine;
 using KModkit;
 using Rnd = UnityEngine.Random;
 
-public class template : MonoBehaviour
+public class supermarketScramble : MonoBehaviour
 {
     [SerializeField] private KMBombInfo Bomb;
     [SerializeField] private KMAudio Audio;
+    [SerializeField] private AudioSource AudioSrc;
+
+    [SerializeField] private AudioClip SupermarketMusic;
+
+    bool moduleStarted;
 
     static int ModuleIdCounter = 1;
     int ModuleId;
@@ -19,6 +24,8 @@ public class template : MonoBehaviour
     void Awake()
     {
         ModuleId = ModuleIdCounter++;
+        GetComponent<KMSelectable>().OnFocus += delegate () { ModuleSelected(); };
+        GetComponent<KMSelectable>().OnDefocus += delegate () { AudioSrc.mute = true; };
         /*
         foreach (KMSelectable object in keypad) {
             object.OnInteract += delegate () { keypadPress(object); return false; };
@@ -28,6 +35,17 @@ public class template : MonoBehaviour
         //button.OnInteract += delegate () { buttonPress(); return false; };
     }
 
+    void ModuleSelected()
+    {
+        if (!moduleStarted)
+        {
+            moduleStarted = true;
+            AudioSrc.clip = SupermarketMusic; 
+            AudioSrc.Play();
+        }
+        AudioSrc.mute = false;
+    }
+
     void Start()
     {
 
@@ -35,7 +53,7 @@ public class template : MonoBehaviour
 
     void Log(string arg)
     {
-        Debug.Log($"[Template #{ModuleId}] {arg}");
+        Debug.Log($"[Supermarket Scramble #{ModuleId}] {arg}");
     }
 
 #pragma warning disable 414
