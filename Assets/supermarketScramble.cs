@@ -20,6 +20,7 @@ public class supermarketScramble : MonoBehaviour
     [SerializeField] private KMSelectable ListToggle;
     [SerializeField] private List<GameObject> ItemButtons;
     [SerializeField] private List<KMSelectable> AisleArrows;
+    [SerializeField] private List<GameObject> Aisles;
 
     List<string> items = new List<string>() { "CUCUMBER", "CELERY", "TOMATO", "SPINACH", "BROCCOLI", "LETTUCE", "ZUCCHINI", "ASPARAGUS", "GARLIC", "CARROT", "ONION", "POTATOES", "CHICKEN", "SAUSAGES", "PORKCHOP", "STEAK", "TURKEY", "HOTDOGS", "BACON", "SALMON", "SHRIMP", "SUSHI", "MUFFINS", "CUPCAKES", "DONUTS", "COOKIES", "DANISHES", "BAGUETTE", "TORTILLAS", "BAGELS", "BREAD", "CROISSANTS", "BANANA", "PINEAPPLE", "COCONUT", "AVOCADO", "LEMON", "ORANGE", "CHERRIES", "GRAPES", "SOUP", "TUNA", "CEREAL", "CRACKERS", "PEANUTS", "COCOA", "MOLASSES", "CINNAMON", "OATMEAL", "SUGAR", "COFFEE", "FLOUR", "BATTERIES", "RAZORS", "DEODORANT", "SHAMPOO", "BLEACH", "SPONGES", "DETERGENT", "NAPKINS", "DIAPERS", "TISSUES", "POPCORN", "CHOCOLATE", "PIZZA", "ICE CREAM", "POPSICLES", "MILK", "JUICE", "CHEESE", "YOGURT", "EGGS", "MARGARINE", "BUTTER", "RICE", "HONEY", "PASTA", "JELLY", "MUSTARD", "VINEGAR" };
 
@@ -29,6 +30,7 @@ public class supermarketScramble : MonoBehaviour
     bool moduleStarted;
     bool listView;
     string selectedItem;
+    int curAisle;
 
     static int ModuleIdCounter = 1;
     int ModuleId;
@@ -62,9 +64,15 @@ public class supermarketScramble : MonoBehaviour
             moduleStarted = true;
             AudioSrc.clip = SupermarketMusic; 
             AudioSrc.Play();
+
             listView = true;
             ListObject.SetActive(true);
             AislesParent.SetActive(false);
+            for (int i = 0; i < Aisles.Count; i++)
+            {
+                Aisles[i].SetActive(i == 0);
+            }
+
             GenItems();
             ScrambleItems();
         }
@@ -85,7 +93,11 @@ public class supermarketScramble : MonoBehaviour
 
     void CycleAisles(int dir)
     {
-        Log(dir.ToString());
+        curAisle += dir * 2 - 1;
+        for (int i = 0; i < Aisles.Count; i++)
+        {
+            Aisles[i].SetActive(i == curAisle);
+        }
     }
 
     void GenItems()
