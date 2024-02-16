@@ -19,6 +19,7 @@ public class supermarketScramble : MonoBehaviour
     [SerializeField] private GameObject AislesParent;
     [SerializeField] private KMSelectable ListToggle;
     [SerializeField] private List<GameObject> ItemButtons;
+    [SerializeField] private List<KMSelectable> AisleArrows;
 
     List<string> items = new List<string>() { "CUCUMBER", "CELERY", "TOMATO", "SPINACH", "BROCCOLI", "LETTUCE", "ZUCCHINI", "ASPARAGUS", "GARLIC", "CARROT", "ONION", "POTATOES", "CHICKEN", "SAUSAGES", "PORKCHOP", "STEAK", "TURKEY", "HOTDOGS", "BACON", "SALMON", "SHRIMP", "SUSHI", "MUFFINS", "CUPCAKES", "DONUTS", "COOKIES", "DANISHES", "BAGUETTE", "TORTILLAS", "BAGELS", "BREAD", "CROISSANTS", "BANANA", "PINEAPPLE", "COCONUT", "AVOCADO", "LEMON", "ORANGE", "CHERRIES", "GRAPES", "SOUP", "TUNA", "CEREAL", "CRACKERS", "PEANUTS", "COCOA", "MOLASSES", "CINNAMON", "OATMEAL", "SUGAR", "COFFEE", "FLOUR", "BATTERIES", "RAZORS", "DEODORANT", "SHAMPOO", "BLEACH", "SPONGES", "DETERGENT", "NAPKINS", "DIAPERS", "TISSUES", "POPCORN", "CHOCOLATE", "PIZZA", "ICE CREAM", "POPSICLES", "MILK", "JUICE", "CHEESE", "YOGURT", "EGGS", "MARGARINE", "BUTTER", "RICE", "HONEY", "PASTA", "JELLY", "MUSTARD", "VINEGAR" };
 
@@ -41,6 +42,9 @@ public class supermarketScramble : MonoBehaviour
         ListToggle.OnInteract += delegate () { ToggleList(); return false; };
         foreach (GameObject button in ItemButtons) {
             button.GetComponent<KMSelectable>().OnInteract += delegate () { ItemPress(button); return false; };
+        }
+        foreach (KMSelectable arrow in AisleArrows) {
+            arrow.OnInteract += delegate () { CycleAisles(AisleArrows.IndexOf(arrow)); return false; };
         }
         /*
         foreach (KMSelectable object in keypad) {
@@ -77,6 +81,11 @@ public class supermarketScramble : MonoBehaviour
     void ItemPress(GameObject itemObj)
     {
         selectedItem = itemObj.GetComponent<MarketItem>().ItemName;
+    }
+
+    void CycleAisles(int dir)
+    {
+        Log(dir.ToString());
     }
 
     void GenItems()
