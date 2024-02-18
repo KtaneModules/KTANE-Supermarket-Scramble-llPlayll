@@ -172,6 +172,8 @@ public class supermarketScramble : MonoBehaviour
 
     void Solved()
     {
+        SolveButton.GetComponent<KMSelectable>().AddInteractionPunch();
+        Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.BigButtonPress, SolveButton.transform);
         GetComponent<KMBombModule>().HandlePass();
         ModuleSolved = true;
 
@@ -466,7 +468,6 @@ public class supermarketScramble : MonoBehaviour
                             yield return new WaitForSeconds(0.1f);
                             SlotButtons[TPSlotIdx - 1].OnInteract();
                             SlotButtons[TPSlotIdx - 1].OnHighlightEnded();
-                            yield return new WaitForSeconds(0.5f);
                         }
                     }
                 }
@@ -504,7 +505,6 @@ public class supermarketScramble : MonoBehaviour
                     SlotButtons[TPSlotIdx - 1].GetComponent<KMSelectable>().OnSelect();
                     yield return new WaitForSeconds(1f);
                     SlotButtons[TPSlotIdx - 1].GetComponent<KMSelectable>().OnHighlightEnded();
-                    yield return new WaitForSeconds(0.5f);
                 }
                 GetComponent<KMSelectable>().OnDefocus();
                 break;
