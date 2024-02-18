@@ -44,6 +44,8 @@ public class supermarketScramble : MonoBehaviour
     bool success;
     int hours, minutes, seconds = 0;
 
+    List<string> TPDirList = new List<string>() { "left", "right", "l", "r" };
+
     static int ModuleIdCounter = 1;
     int ModuleId;
     private bool ModuleSolved;
@@ -273,11 +275,265 @@ public class supermarketScramble : MonoBehaviour
     }
 
 #pragma warning disable 414
-    private readonly string TwitchHelpMessage = @"Use !{0} to do something.";
-#pragma warning restore 414
+    private readonly string TwitchHelpMessage = @"Use <!{0} select> to select the module (to start it). Use <!{0} list> to toggle the list. Use <!{0} left/l/right/r #> to go left/right # times or 1 time if # not specified. Use <!{0} inspect #> to highlight the #th button in the aisle. Use <!{0} put #1 #2> to put the #1th item from the aisle into the #2th cart slot. Use <!{0} slot #> to highlight the #th slot to see what's slotted in it. Use <!{0} solve> to press the Solve Button in the checkout lane.";
+#pragma warning restore 4141
 
     IEnumerator ProcessTwitchCommand(string Command)
     {
+        var commandArgs = Command.Split(new[] { ' ' }, 3);
+        if (commandArgs.Length < 1)
+        {
+            yield return "sendtochatmessage No command supplied!";
+        }
+        switch (commandArgs[0])
+        {
+            case "select":
+                if (moduleStarted)
+                {
+                    yield return "sendtochatmessage Module already started!";
+                }
+                else
+                {
+                    GetComponent<KMSelectable>().OnFocus();
+                    yield return null;
+                    ModuleSelected();
+                    yield return new WaitForSeconds(0.1f);
+                }
+                GetComponent<KMSelectable>().OnDefocus();
+                break;
+            case "list":
+                if (!moduleStarted)
+                {
+                    yield return "sendtochatmessage Module not started!";
+                }
+                else
+                {
+                    GetComponent<KMSelectable>().OnFocus();
+                    yield return null;
+                    ListToggle.OnInteract();
+                    yield return new WaitForSeconds(0.1f);
+                }
+                GetComponent<KMSelectable>().OnDefocus();
+                break;
+            case "left":
+            case "right":
+            case "l":
+            case "r":
+                if (!moduleStarted)
+                {
+                    yield return "sendtochatmessage Module not started!";
+                }
+                else if (listView)
+                {
+                    yield return "sendtochatmessage You are currently viewing the list!";
+                }
+                else
+                {
+                    int TPTimes = 1;
+                    if (commandArgs.Length == 2)
+                    {
+                        bool tryParse = Int32.TryParse(commandArgs[1], out TPTimes);
+                        if (tryParse)
+                        {
+                            TPTimes = Int32.Parse(commandArgs[1]);
+                        }
+                        else
+                        {
+                            yield return "sendtochatmessage Invalid amount of times!";
+                        }  
+                    }
+                    else if (commandArgs.Length > 2)
+                    {
+                        yield return "sendtochatmessage Command too long!";
+                    }
+
+                    int TPDir = TPDirList.IndexOf(commandArgs[0]) % 2;
+                    GetComponent<KMSelectable>().OnFocus();
+                    yield return null;
+                    for (int i = 0; i < TPTimes; i++)
+                    {
+                        AisleArrows[TPDir].OnInteract();
+                        yield return new WaitForSeconds(0.1f);
+                    }
+                }
+                GetComponent<KMSelectable>().OnDefocus();
+                break;
+            case "inspect":
+                if (listView)
+                {
+                    yield return "sendtochatmessage You are currently viewing the list!";
+                }
+                else if (curAisle == -1)
+                {
+                    yield return "sendtochatmessage You are at the checkout lane!";
+                }
+                else
+                {
+                    if (commandArgs.Length < 2)
+                    {
+                        yield return "sendtochatmessage Command too short!";
+                    }
+                    else if (commandArgs.Length > 2)
+                    {
+                        yield return "sendtochatmessage Command too long!";
+                    }
+                    else
+                    {
+                        int TPButtonIdx;
+                        bool tryParse = Int32.TryParse(commandArgs[1], out TPButtonIdx);
+                        if (tryParse)
+                        {
+                            TPButtonIdx = Int32.Parse(commandArgs[1]);
+                        }
+                        else
+                        {
+                            yield return "sendtochatmessage Invalid button number!";
+                        }
+
+                        if (TPButtonIdx < 1 || TPButtonIdx > Aisles[curAisle].transform.childCount)
+                        {
+                            yield return "sendtochatmessage Button number not in range!";
+                        }
+                        else
+                        {
+                            GetComponent<KMSelectable>().OnFocus();
+                            yield return null;
+                            Aisles[curAisle].transform.GetChild(TPButtonIdx - 1).GetComponent<KMSelectable>().OnSelect();
+                            yield return new WaitForSeconds(1f);
+                            Aisles[curAisle].transform.GetChild(TPButtonIdx - 1).GetComponent<KMSelectable>().OnHighlightEnded();
+                            yield return new WaitForSeconds(0.5f);
+                        }
+                    }
+                }
+                GetComponent<KMSelectable>().OnDefocus();
+                break;
+            case "put":
+                if (listView)
+                {
+                    yield return "sendtochatmessage You are currently viewing the list!";
+                }
+                else if (curAisle == -1)
+                {
+                    yield return "sendtochatmessage You are at the checkout lane!";
+                }
+                if (commandArgs.Length < 3)
+                {
+                    yield return "sendtochatmessage Command too short!";
+                }
+                else if (commandArgs.Length > 3)
+                {
+                    yield return "sendtochatmessage Command too long!";
+                }
+                else
+                {
+                    int TPItemIdx;
+                    bool tryParseItem = Int32.TryParse(commandArgs[1], out TPItemIdx);
+                    if (tryParseItem)
+                    {
+                        TPItemIdx = Int32.Parse(commandArgs[1]);
+                    }
+                    else
+                    {
+                        yield return "sendtochatmessage Invalid item number!";
+                    }
+
+                    if (TPItemIdx < 1 || TPItemIdx > Aisles[curAisle].transform.childCount)
+                    {
+                        yield return "sendtochatmessage Button number not in range!";
+                    }
+                    else
+                    {
+                        int TPSlotIdx;
+                        bool tryParseSlot = Int32.TryParse(commandArgs[2], out TPSlotIdx);
+                        if (tryParseSlot)
+                        {
+                            TPSlotIdx = Int32.Parse(commandArgs[2]);
+                        }
+                        else
+                        {
+                            yield return "sendtochatmessage Invalid slot number!";
+                        }
+
+                        if (TPSlotIdx < 1 || TPSlotIdx > 8)
+                        {
+                            yield return "sendtochatmessage Slot number not in range!";
+                        }
+                        else
+                        {
+                            GetComponent<KMSelectable>().OnFocus();
+                            yield return null;
+                            Aisles[curAisle].transform.GetChild(TPItemIdx - 1).GetComponent<KMSelectable>().OnInteract();
+                            yield return new WaitForSeconds(0.1f);
+                            SlotButtons[TPSlotIdx - 1].OnInteract();
+                            SlotButtons[TPSlotIdx - 1].OnHighlightEnded();
+                            yield return new WaitForSeconds(0.5f);
+                        }
+                    }
+                }
+                GetComponent<KMSelectable>().OnDefocus();
+                break;
+            case "slot":
+                if (listView)
+                {
+                    yield return "sendtochatmessage You are currently viewing the list!";
+                }
+
+                if (commandArgs.Length < 2)
+                {
+                    yield return "sendtochatmessage Command too short!";
+                }
+                else if (commandArgs.Length > 2)
+                {
+                    yield return "sendtochatmessage Command too long!";
+                }
+                else
+                {
+                    int TPSlotIdx;
+                    bool tryParseSlot = Int32.TryParse(commandArgs[1], out TPSlotIdx);
+                    if (tryParseSlot)
+                    {
+                        TPSlotIdx = Int32.Parse(commandArgs[1]);
+                    }
+                    else
+                    {
+                        yield return "sendtochatmessage Invalid slot number!";
+                    }
+
+                    GetComponent<KMSelectable>().OnFocus();
+                    yield return null;
+                    SlotButtons[TPSlotIdx - 1].GetComponent<KMSelectable>().OnSelect();
+                    yield return new WaitForSeconds(1f);
+                    SlotButtons[TPSlotIdx - 1].GetComponent<KMSelectable>().OnHighlightEnded();
+                    yield return new WaitForSeconds(0.5f);
+                }
+                GetComponent<KMSelectable>().OnDefocus();
+                break;
+            case "solve":
+                if (listView)
+                {
+                    yield return "sendtochatmessage You are currently viewing the list!";
+                }
+                else if (curAisle != -1)
+                {
+                    yield return "sendtochatmessage You are not at the checkout lane!";
+                }
+                else if (!success)
+                {
+                    yield return "sendtochatmessage Solve button unavailable!";
+                }
+                else
+                {
+                    GetComponent<KMSelectable>().OnFocus();
+                    yield return null;
+                    SolveButton.GetComponent<KMSelectable>().OnInteract();
+                    yield return new WaitForSeconds(0.1f);
+                }
+                GetComponent<KMSelectable>().OnDefocus();
+                break;
+            default:
+                yield return "sendtochatmessage Invalid command!";
+                break;
+        }
         yield return null;
     }
 
