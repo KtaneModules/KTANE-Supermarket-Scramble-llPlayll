@@ -57,12 +57,12 @@ public class supermarketScramble : MonoBehaviour
         foreach (GameObject button in ItemButtons) {
             button.GetComponent<KMSelectable>().OnInteract += delegate () { ItemPress(button); return false; };
             button.GetComponent<KMSelectable>().OnSelect += delegate () { HighlightText.text = button.GetComponent<MarketItem>().ItemName == "ICECREAM" ? "ICE CREAM" : button.GetComponent<MarketItem>().ItemName; };
-            button.GetComponent<KMSelectable>().OnDeselect += delegate () { HighlightText.text = ""; };
+            button.GetComponent<KMSelectable>().OnHighlightEnded += delegate () { HighlightText.text = ""; };
         }
         foreach (KMSelectable slot in SlotButtons) {
             slot.OnInteract += delegate () { SlotPress(SlotButtons.IndexOf(slot)); return false; };
             slot.OnSelect += delegate () { HighlightText.text = slottedItems[SlotButtons.IndexOf(slot)]; };
-            slot.OnDeselect += delegate () { HighlightText.text = ""; };
+            slot.OnHighlightEnded += delegate () { HighlightText.text = ""; };
         }
         foreach (KMSelectable arrow in AisleArrows) {
             arrow.OnInteract += delegate () { CycleAisles(AisleArrows.IndexOf(arrow)); return false; };

@@ -1,0 +1,10 @@
+{
+  "name": "supermarketScramble-Editor",
+  "references": [
+    "supermarketScramble"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": []
+}
