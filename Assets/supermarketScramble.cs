@@ -78,6 +78,7 @@ public class supermarketScramble : MonoBehaviour
         if (!moduleStarted)
         {
             moduleStarted = true;
+            StartCoroutine("Timer");
             AudioSrc.clip = SupermarketMusic;
             AudioSrc.Play();
 
@@ -229,7 +230,6 @@ public class supermarketScramble : MonoBehaviour
         {
             iText.SetActive(false);
         }
-        StartCoroutine("Timer");
     }
 
     string TitleString(string n)
@@ -539,6 +539,33 @@ public class supermarketScramble : MonoBehaviour
 
     IEnumerator TwitchHandleForcedSolve()
     {
-        yield return null;
+        if (!moduleStarted) { yield return null; GetComponent<KMSelectable>().OnFocus(); };
+        if (listView) { yield return null; ListToggle.OnInteract(); }
+        int TPAisle = curAisle;
+        for (int i = 0; i < (14 - TPAisle); i++)
+        {
+            yield return null;
+            AisleArrows[1].OnInteract();
+            yield return new WaitForSeconds(0.01f);
+        }
+
+        for (int i = 0; i < 14; i++)
+        {
+            for (int j = 0; j < Aisles[curAisle].transform.childCount; j++)
+            {
+                string checkItem = Aisles[curAisle].transform.GetChild(j).GetComponent<MarketItem>().ItemName;
+                if (modUnscrItems.Contains(checkItem))
+                {
+                    Aisles[curAisle].transform.GetChild(j).GetComponent<KMSelectable>().OnInteract();
+                    yield return new WaitForSeconds(0.01f);
+                    SlotButtons[modUnscrItems.IndexOf(checkItem)].OnInteract();
+                    yield return new WaitForSeconds(0.01f);
+                } 
+            }
+            AisleArrows[0].OnInteract();
+            yield return new WaitForSeconds(0.01f);
+        }
+
+        SolveButton.GetComponent<KMSelectable>().OnInteract();
     }
 }
