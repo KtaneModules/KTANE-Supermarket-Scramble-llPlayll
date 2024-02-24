@@ -277,7 +277,7 @@ public class supermarketScramble : MonoBehaviour
     }
 
 #pragma warning disable 414
-    private readonly string TwitchHelpMessage = @"Use <!{0} select> to select the module (to start it). Use <!{0} list> to toggle the list. Use <!{0} left/l/right/r #> to go left/right # times or 1 time if # not specified. Use <!{0} inspect #> to highlight the #th button in the aisle. Use <!{0} put #1 #2> to put the #1th item from the aisle into the #2th cart slot. Use <!{0} slot #> to highlight the #th slot to see what's slotted in it. Use <!{0} solve> to press the Solve Button in the checkout lane.";
+    private readonly string TwitchHelpMessage = @"Use <!{0} select> to select the module (to start it). Use <!{0} list> to toggle the list. Use <!{0} left/l/right/r #> to go left/right # times or 1 time if # not specified. Use <!{0} inspect #> to highlight the #th button in the aisle. Use <!{0} put #1 #2> to put the #1th item from the aisle into the #2th cart slot. Use <!{0} slot #> to highlight the #th slot to see what's slotted in it. Use <!{0} solvebutton> to press the Solve Button in the checkout lane.";
 #pragma warning restore 4141
 
     IEnumerator ProcessTwitchCommand(string Command)
@@ -508,7 +508,7 @@ public class supermarketScramble : MonoBehaviour
                 }
                 GetComponent<KMSelectable>().OnDefocus();
                 break;
-            case "solve":
+            case "solvebutton":
                 if (listView)
                 {
                     yield return "sendtochatmessage You are currently viewing the list!";
