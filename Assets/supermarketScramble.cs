@@ -54,7 +54,7 @@ public class supermarketScramble : MonoBehaviour
     {
         ModuleId = ModuleIdCounter++;
         GetComponent<KMSelectable>().OnFocus += delegate () { ModuleSelected(); };
-        GetComponent<KMSelectable>().OnDefocus += delegate () { AudioSrc.mute = true; };
+        GetComponent<KMSelectable>().OnDefocus += delegate () { AudioSrc.Pause(); };
         ListToggle.OnInteract += delegate () { ToggleList(); return false; };
         foreach (GameObject button in ItemButtons) {
             button.GetComponent<KMSelectable>().OnInteract += delegate () { ItemPress(button); return false; };
@@ -97,7 +97,7 @@ public class supermarketScramble : MonoBehaviour
             GenItems();
             ScrambleItems();
         }
-        AudioSrc.mute = false;
+        AudioSrc.UnPause();
     }
 
     void ToggleList()
