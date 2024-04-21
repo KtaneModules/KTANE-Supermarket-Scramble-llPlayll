@@ -335,14 +335,10 @@ public class supermarketScramble : MonoBehaviour
                     if (commandArgs.Length == 2)
                     {
                         bool tryParse = Int32.TryParse(commandArgs[1], out TPTimes);
-                        if (tryParse)
-                        {
-                            TPTimes = Int32.Parse(commandArgs[1]);
-                        }
-                        else
+                        if (!tryParse)
                         {
                             yield return "sendtochatmessage Invalid amount of times!";
-                        }  
+                        }
                     }
                     else if (commandArgs.Length > 2)
                     {
@@ -383,16 +379,11 @@ public class supermarketScramble : MonoBehaviour
                     {
                         int TPButtonIdx;
                         bool tryParse = Int32.TryParse(commandArgs[1], out TPButtonIdx);
-                        if (tryParse)
-                        {
-                            TPButtonIdx = Int32.Parse(commandArgs[1]);
-                        }
-                        else
+                        if (!tryParse)
                         {
                             yield return "sendtochatmessage Invalid button number!";
                         }
-
-                        if (TPButtonIdx < 1 || TPButtonIdx > Aisles[curAisle].transform.childCount)
+                        else if (TPButtonIdx < 1 || TPButtonIdx > Aisles[curAisle].transform.childCount)
                         {
                             yield return "sendtochatmessage Button number not in range!";
                         }
@@ -430,16 +421,11 @@ public class supermarketScramble : MonoBehaviour
                 {
                     int TPItemIdx;
                     bool tryParseItem = Int32.TryParse(commandArgs[1], out TPItemIdx);
-                    if (tryParseItem)
-                    {
-                        TPItemIdx = Int32.Parse(commandArgs[1]);
-                    }
-                    else
+                    if (!tryParseItem)
                     {
                         yield return "sendtochatmessage Invalid item number!";
                     }
-
-                    if (TPItemIdx < 1 || TPItemIdx > Aisles[curAisle].transform.childCount)
+                    else if (TPItemIdx < 1 || TPItemIdx > Aisles[curAisle].transform.childCount)
                     {
                         yield return "sendtochatmessage Button number not in range!";
                     }
@@ -447,16 +433,11 @@ public class supermarketScramble : MonoBehaviour
                     {
                         int TPSlotIdx;
                         bool tryParseSlot = Int32.TryParse(commandArgs[2], out TPSlotIdx);
-                        if (tryParseSlot)
-                        {
-                            TPSlotIdx = Int32.Parse(commandArgs[2]);
-                        }
-                        else
+                        if (!tryParseSlot)
                         {
                             yield return "sendtochatmessage Invalid slot number!";
                         }
-
-                        if (TPSlotIdx < 1 || TPSlotIdx > 8)
+                        else if (TPSlotIdx < 1 || TPSlotIdx > 8)
                         {
                             yield return "sendtochatmessage Slot number not in range!";
                         }
@@ -493,18 +474,23 @@ public class supermarketScramble : MonoBehaviour
                     bool tryParseSlot = Int32.TryParse(commandArgs[1], out TPSlotIdx);
                     if (tryParseSlot)
                     {
-                        TPSlotIdx = Int32.Parse(commandArgs[1]);
+                        if (TPSlotIdx < 1 || TPSlotIdx > 8)
+                        {
+                            yield return "sendtochatmessage Slot number not in range!";
+                        }
+                        else
+                        {
+                            GetComponent<KMSelectable>().OnFocus();
+                            yield return null;
+                            SlotButtons[TPSlotIdx - 1].GetComponent<KMSelectable>().OnSelect();
+                            yield return new WaitForSeconds(1f);
+                            SlotButtons[TPSlotIdx - 1].GetComponent<KMSelectable>().OnHighlightEnded();
+                        }  
                     }
                     else
                     {
                         yield return "sendtochatmessage Invalid slot number!";
                     }
-
-                    GetComponent<KMSelectable>().OnFocus();
-                    yield return null;
-                    SlotButtons[TPSlotIdx - 1].GetComponent<KMSelectable>().OnSelect();
-                    yield return new WaitForSeconds(1f);
-                    SlotButtons[TPSlotIdx - 1].GetComponent<KMSelectable>().OnHighlightEnded();
                 }
                 GetComponent<KMSelectable>().OnDefocus();
                 break;
